@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kaiju Academy</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;background:#08081a;font-family:'Courier New',Courier,monospace;color:#fff}
+body{min-height:100vh}
+.scr{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:13px;text-align:center}
+.btn{padding:9px 13px;font-family:inherit;font-size:9px;cursor:pointer;border:none;color:#fff;margin:3px;transition:transform .1s;letter-spacing:1px;font-weight:bold}
+.btn:active{transform:translateY(3px)!important;box-shadow:none!important}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.r{background:#c0392b;box-shadow:0 4px 0 #7b241c}
+.b{background:#2471a3;box-shadow:0 4px 0 #1a4971}
+.g{background:#1e8449;box-shadow:0 4px 0 #145a32}
+.y{background:#b7950b;box-shadow:0 4px 0 #7d6608}
+.gr{background:#424949;box-shadow:0 4px 0 #2c3333}
+.teal{background:#16a085;box-shadow:0 4px 0 #0e6655}
+.pbox{border:3px solid rgba(255,255,255,.15);background:rgba(0,0,0,.5);padding:12px}
+.kspr{display:inline-block;image-rendering:pixelated;background-repeat:no-repeat;border-radius:6px}
+.kspr.flip{transform:scaleX(-1)}
+.kspr.shk{animation:shk .4s}
+.kspr.atkA{animation:atkA .45s}
+.kspr.flip.shk{animation:shkF .4s}
+.kspr.flip.atkA{animation:atkF .45s}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+@keyframes shkF{0%,100%{transform:scaleX(-1)}25%{transform:scaleX(-1) translateX(10px)}75%{transform:scaleX(-1) translateX(-10px)}}
+@keyframes atkA{0%,100%{transform:translateX(0)scale(1)}50%{transform:translateX(20px)scale(1.15)}}
+@keyframes atkF{0%,100%{transform:scaleX(-1)scale(1)}50%{transform:scaleX(-1) translateX(-20px)scale(1.15)}}
+@keyframes pop{from{opacity:0;transform:scale(.75)}to{opacity:1;transform:scale(1)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes beamAT{0%{transform:scaleX(0);opacity:0}40%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@keyframes burstFI{0%{transform:translate(-50%,-50%)scale(0);opacity:1}100%{transform:translate(-50%,-50%)scale(3);opacity:0}}
+@keyframes ringPH{0%{transform:translate(-50%,-50%)scale(0);opacity:1;border-width:8px}100%{transform:translate(-50%,-50%)scale(2.8);opacity:0;border-width:1px}}
+@keyframes sweepFL{0%{transform:translateX(-120%);opacity:0}30%{opacity:1}100%{transform:translateX(120%);opacity:0}}
+@keyframes laserME{0%{transform:scaleX(0);opacity:1}50%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@keyframes acidTX{0%{height:0;opacity:1}70%{height:65%;opacity:1}100%{height:75%;opacity:0}}
+@keyframes triRing{0%{transform:translate(-50%,-50%)scale(0);opacity:1}100%{transform:translate(-50%,-50%)scale(3);opacity:0}}
+@keyframes flashLI{0%,100%{opacity:0}15%,55%{opacity:.9}35%,75%{opacity:.15}}
+@keyframes sshk{0%,100%{transform:none}20%{transform:translateX(-7px) translateY(-3px)}40%{transform:translateX(7px) translateY(3px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.hpbar{background:#111;border:2px solid #000;height:13px;margin-top:3px}
+.hpfill{height:100%;transition:width .4s,background .4s}
+.hgrid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:600px}
+.hcard{background:#111128;border:3px solid #252555;padding:7px;cursor:pointer;text-align:center;width:108px;transition:transform .15s,border-color .15s}
+.hcard:hover,.hcard:active{transform:translateY(-4px);border-color:#f1c40f}
+.hcard.locked{opacity:.3;cursor:not-allowed}
+.hcard.locked:hover{transform:none;border-color:#252555}
+.arena{width:100%;position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:flex-end;padding:12px;min-height:178px;border:2px solid #1e2040}
+.arena.sshk{animation:sshk .4s}
+.log{background:#000;border:2px solid #1a1a3a;padding:8px;font-size:8px;color:#2ecc71;min-height:40px;line-height:2;text-align:center;width:100%}
+.fx{position:absolute;pointer-events:none}
+.fx-AT{left:8%;top:36%;width:88%;height:18px;background:linear-gradient(90deg,transparent,#3498db,#85c1e9,#fff,#85c1e9,#3498db,transparent);box-shadow:0 0 22px #3498db,0 0 44px rgba(52,152,219,.4);animation:beamAT .6s forwards;border-radius:9px;transform-origin:left}
+.fx-FI{left:65%;top:10%;width:110px;height:110px;background:radial-gradient(circle,#fff 0%,#f39c12 20%,#e74c3c 55%,transparent 100%);box-shadow:0 0 35px #e74c3c;transform:translate(-50%,-50%);animation:burstFI .65s forwards;border-radius:50%}
+.fx-PH{left:58%;top:50%;width:130px;height:130px;border:8px solid rgba(200,200,200,.9);box-shadow:0 0 20px rgba(255,255,255,.5);transform:translate(-50%,-50%);animation:ringPH .55s forwards;border-radius:50%}
+.fx-FL{left:0;top:28%;width:100%;height:10px;background:linear-gradient(90deg,transparent,#f1c40f,#fff,#f1c40f,transparent);box-shadow:0 0 15px #f1c40f;animation:sweepFL .5s forwards}
+.fx-ME{left:8%;top:47%;width:88%;height:5px;background:linear-gradient(90deg,transparent,#e74c3c,#fff,#e74c3c,transparent);box-shadow:0 0 14px #e74c3c;animation:laserME .45s forwards;transform-origin:left}
+.fx-TX{left:62%;top:3%;width:16px;height:0;background:linear-gradient(180deg,#2ecc71,#27ae60,transparent);box-shadow:0 0 12px #2ecc71;animation:acidTX .65s forwards;border-radius:8px}
+.fx-EV{left:58%;top:50%;width:120px;height:120px;border:4px solid #9b59b6;box-shadow:0 0 30px #9b59b6;transform:translate(-50%,-50%);animation:triRing .55s forwards;border-radius:50%}
+.fx-LI{left:0;top:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(255,255,255,.6),rgba(241,196,15,.4));animation:flashLI .55s forwards}
+.fx-eAT{right:8%;top:36%;width:88%;height:18px;background:linear-gradient(270deg,transparent,#e74c3c,#ec7063,#fff,#ec7063,#e74c3c,transparent);box-shadow:0 0 22px #e74c3c;animation:beamAT .6s forwards;border-radius:9px;transform-origin:right}
+.fx-eFI{left:20%;top:10%;width:110px;height:110px;background:radial-gradient(circle,#fff,#e74c3c,#922b21,transparent);box-shadow:0 0 35px #c0392b;transform:translate(-50%,-50%);animation:burstFI .65s forwards;border-radius:50%}
+.fx-ePH{left:35%;top:50%;width:130px;height:130px;border:8px solid rgba(200,200,200,.9);box-shadow:0 0 20px rgba(255,255,255,.5);transform:translate(-50%,-50%);animation:ringPH .55s forwards;border-radius:50%}
+.fx-eFL{left:0;top:40%;width:100%;height:10px;background:linear-gradient(270deg,transparent,#f1c40f,#fff,#f1c40f,transparent);box-shadow:0 0 15px #f1c40f;animation:sweepFL .5s forwards}
+.fx-eME{right:8%;top:47%;width:88%;height:5px;background:linear-gradient(270deg,transparent,#e74c3c,#fff,#e74c3c,transparent);box-shadow:0 0 14px #e74c3c;animation:laserME .45s forwards;transform-origin:right}
+.fx-eTX{left:25%;top:3%;width:16px;height:0;background:linear-gradient(180deg,#2ecc71,#27ae60,transparent);box-shadow:0 0 12px #2ecc71;animation:acidTX .65s forwards;border-radius:8px}
+.fx-eEV{left:35%;top:50%;width:120px;height:120px;border:4px solid #9b59b6;box-shadow:0 0 30px #9b59b6;transform:translate(-50%,-50%);animation:triRing .55s forwards;border-radius:50%}
+.fx-eLI{left:0;top:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(255,255,255,.6),rgba(241,196,15,.4));animation:flashLI .55s forwards}
+.rage{font-size:7px;color:#f1c40f;text-align:center;margin:2px 0;animation:bob .8s infinite}
+.dgrid{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;max-width:600px;margin-top:8px;padding-bottom:20px}
+.mcard{width:72px;height:72px;border:2px solid #222;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;background:#111128;text-align:center;overflow:hidden}
+.mcard.got{border-color:#f1c40f}.mcard.play{border-color:#27ae60}.mcard.no{filter:brightness(.2)}
+.mname{font-size:4.2px;color:#aaa;margin-top:2px;line-height:1.4}
+#qmod{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100;align-items:center;justify-content:center}
+#qmod.on{display:flex}
+.qbox{background:#111128;border:4px solid #f1c40f;padding:16px;max-width:440px;width:93%;animation:pop .3s;text-align:center}
+.qbadge{font-size:7px;color:#f1c40f;margin-bottom:7px;font-weight:bold}
+.qtxt{font-size:12px;line-height:1.8;margin-bottom:13px;white-space:pre-line}
+.remo{font-size:50px;display:block;margin-bottom:7px}
+.aopts{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.abtn{background:#12122e;border:3px solid #252555;padding:8px 11px;font-family:inherit;font-size:9px;cursor:pointer;color:#fff;min-width:80px}
+.abtn:hover,.abtn:active{border-color:#f1c40f}
+.abtn.ok{border-color:#27ae60;background:#081a0f}
+.abtn.no{border-color:#e74c3c;background:#1a0808}
+.qfb{font-size:9px;margin-top:9px;min-height:16px}
+.logo{font-size:20px;color:#f1c40f;text-shadow:3px 3px 0 #e74c3c,7px 7px 0 #000;line-height:1.5;animation:bob 2s infinite;font-weight:bold;letter-spacing:2px}
+.pixinput{background:#111128;border:3px solid #f1c40f;color:#fff;font-family:inherit;font-size:11px;padding:9px 12px;text-align:center;width:210px;outline:none}
+.loader{width:36px;height:36px;border:4px solid #333;border-top-color:#f1c40f;border-radius:50%;animation:spin 1s linear infinite;margin:14px auto}
+.progbar{background:#222;border:2px solid #333;height:14px;width:200px;margin:8px auto}
+.progfill{height:100%;background:#f1c40f;transition:width .3s}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="scr" style="background:#08081a">
+    <div class="logo">KAIJU<br>ACADEMY</div>
+    <div class="loader"></div>
+    <div class="progbar"><div class="progfill" id="progfill" style="width:0%"></div></div>
+    <div id="loading-msg" style="font-size:7px;color:#aaa;margin-top:6px">Loading kaiju sprites...</div>
+  </div>
+</div>
+<div id="qmod">
+  <div class="qbox">
+    <div id="qbadge" class="qbadge"></div>
+    <div id="remo" class="remo" style="display:none"></div>
+    <div id="qtxt" class="qtxt"></div>
+    <div id="aopts" class="aopts"></div>
+    <div id="qfb" class="qfb"></div>
+  </div>
+</div>
+<script>
+// ===== IMAGE SYSTEM =====
+const BASE='https://aiyaya-afk.github.io/Kaiju/';
+const ICFG={
+  heroes:{url:BASE+'file_000000009e687207b9b52fd749ffbfb9.png',cols:3,rows:2},
+  toho:{url:BASE+'file_0000000095c471fa90821d97297dc7b6.png',cols:3,rows:3},
+  rim:{url:BASE+'file_00000000690872078f33d1e078c3f866.png',cols:5,rows:2},
+  special:{url:BASE+'file_00000000975c72099012ffca1016bfc2.png',cols:2,rows:2},
+};
+const IDIM={},LOADED={};
+let imgLoadedCount=0;
+function preloadImgs(){
+  const total=Object.keys(ICFG).length;
+  return Promise.all(Object.entries(ICFG).map(([k,cfg])=>new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{IDIM[k]={w:img.naturalWidth,h:img.naturalHeight};LOADED[k]=true;updateProg(++imgLoadedCount,total);res();};
+    img.onerror=()=>{IDIM[k]={w:cfg.cols*300,h:cfg.rows*300};LOADED[k]=false;updateProg(++imgLoadedCount,total);res();};
+    setTimeout(()=>{if(!IDIM[k]){IDIM[k]={w:cfg.cols*300,h:cfg.rows*300};LOADED[k]=false;updateProg(++imgLoadedCount,total);res();}},8000);
+    img.src=cfg.url;
+  })));
+}
+function updateProg(n,t){
+  const p=document.getElementById('progfill'),m=document.getElementById('loading-msg');
+  if(p)p.style.width=(n/t*100)+'%';
+  if(m)m.textContent=`Loading sprites... ${n}/${t}`;
+}
+function ss(m,z=90){
+  const cfg=ICFG[m.i],dim=IDIM[m.i];
+  if(!cfg||!dim||!LOADED[m.i])return null;
+  const cw=dim.w/cfg.cols,ch=dim.h/cfg.rows,sx=z/cw,sy=z/ch;
+  return`background:url(${cfg.url}) ${-(m.c*cw*sx).toFixed(1)}px ${-(m.r*ch*sy).toFixed(1)}px/${(dim.w*sx).toFixed(1)}px ${(dim.h*sy).toFixed(1)}px;width:${z}px;height:${z}px;image-rendering:pixelated;background-repeat:no-repeat;`;
+}
+const FBG={AT:'#1a5276',FI:'#922b21',PH:'#4a4a55',FL:'#7a5000',ME:'#2e4060',TX:'#1a6030',EV:'#5b2c8b',LI:'#7a4000'};
+function sprHtml(key,z,id='',flip=false){
+  const m=MD[key],sp=ss(m,z);
+  const idA=id?` id="${id}"`:''
+  const cls=`kspr${flip?' flip':''}`;
+  if(sp)return`<div${idA} class="${cls}" style="${sp}border:2px solid rgba(255,255,255,.15);"></div>`;
+  return`<div${idA} class="${cls}" style="width:${z}px;height:${z}px;background:${FBG[m.t]||'#252555'};font-size:${Math.round(z*.55)}px;line-height:${z}px;text-align:center;border-radius:6px;border:2px solid rgba(255,255,255,.2);">${m.e}</div>`;
+}
+const $=id=>document.getElementById(id);
+
+// ===== MONSTER DATA =====
+const MD={
+  GODZILLA:{n:'Godzilla',e:'🦖',i:'heroes',c:0,r:0,t:'AT',hp:120,atk:['Atomic Breath','Tail Slam','Nuclear Pulse'],dmg:[25,18,30]},
+  MOTHRA:{n:'Mothra',e:'🦋',i:'heroes',c:1,r:0,t:'FL',hp:90,atk:['Wing Blast','Silk Trap','Beam Strike'],dmg:[18,14,24],pass:{tp:'hpB',v:8}},
+  MECHAG:{n:'MechaGodzilla',e:'🤖',i:'heroes',c:2,r:0,t:'ME',hp:130,atk:['Laser Beam','Rocket Fist','Shield Bash'],dmg:[26,20,16]},
+  JAEGER:{n:'Jaeger',e:'⚙️',i:'heroes',c:0,r:1,t:'ME',hp:125,atk:['Plasma Cannon','Elbow Rocket','Sword Slash'],dmg:[24,22,20]},
+  OTACHI:{n:'Otachi',e:'🐉',i:'heroes',c:1,r:1,t:'TX',hp:100,atk:['Acid Spit','Tail Whip','Wing Dive'],dmg:[26,16,22]},
+  KONG:{n:'King Kong',e:'🦍',i:'heroes',c:2,r:1,t:'PH',hp:110,atk:['Ground Pound','Chest Beat','Boulder Throw'],dmg:[22,18,26]},
+  EVOGZ:{n:'Evolved Godzilla',e:'💜',i:'special',c:0,r:0,t:'EV',hp:200,atk:['Purple Beam','Gravity Crush','Void Nova'],dmg:[45,38,55],bossOnly:true},
+  BURNGZ:{n:'Burning Godzilla',e:'🔥',i:'special',c:1,r:0,t:'FI',hp:190,atk:['Thermal Blast','Meltdown','Fire Supernova'],dmg:[52,42,62],bossOnly:true},
+  ANGUIRUS:{n:'Anguirus',e:'🐢',i:'toho',c:0,r:0,t:'PH',hp:95,atk:['Roll Attack','Horn Slam','Tail Spin'],dmg:[20,18,22],pass:{tp:'healC',v:3}},
+  RODAN:{n:'Rodan',e:'🦅',i:'toho',c:1,r:0,t:'FL',hp:85,atk:['Wind Shear','Sonic Boom','Dive Bomb'],dmg:[22,20,26],pass:{tp:'atkB',v:2}},
+  GHIDORAH:{n:'King Ghidorah',e:'🐲',i:'toho',c:2,r:0,t:'LI',hp:180,atk:['Triple Lightning','Gravity Beam','Annihilator'],dmg:[38,34,44],boss:true,pass:{tp:'starsX',v:1.5}},
+  BIOLLANTE:{n:'Biollante',e:'🌿',i:'toho',c:0,r:1,t:'TX',hp:110,atk:['Vine Whip','Acid Spray','Pollen Cloud'],dmg:[24,20,18],pass:{tp:'healC',v:5}},
+  GIGAN:{n:'Gigan',e:'⚔️',i:'toho',c:1,r:1,t:'ME',hp:100,atk:['Buzzsaw','Laser Eye','Hook Slash'],dmg:[26,22,24]},
+  HEDORAH:{n:'Hedorah',e:'💀',i:'toho',c:2,r:1,t:'TX',hp:105,atk:['Acid Rain','Sludge Bomb','Smog Cloud'],dmg:[20,24,22],pass:{tp:'eRed',v:2}},
+  DESTOROYAH:{n:'Destoroyah',e:'👹',i:'toho',c:0,r:2,t:'FI',hp:160,atk:['O2 Destroyer','Micro Beam','Horn Charge'],dmg:[40,34,28],boss:true},
+  SPACEGZ:{n:'SpaceGodzilla',e:'⭐',i:'toho',c:1,r:2,t:'AT',hp:165,atk:['Corona Beam','Crystal Spire','Telekinesis'],dmg:[38,32,30],boss:true},
+  SKULLCRAWLER:{n:'Skullcrawler',e:'🦴',i:'toho',c:2,r:2,t:'PH',hp:80,atk:['Jaw Slam','Tail Whip','Pounce'],dmg:[20,18,24]},
+  TRESPASSER:{n:'Trespasser',e:'🦕',i:'rim',c:0,r:0,t:'PH',hp:90,atk:['Ram Charge','Tail Crush','Body Slam'],dmg:[22,18,20]},
+  KNIFEHEAD:{n:'Knifehead',e:'🦈',i:'rim',c:1,r:0,t:'PH',hp:85,atk:['Head Ram','Claw Slash','Deep Dive'],dmg:[24,20,18]},
+  OTACHI_W:{n:'Otachi Wild',e:'🐊',i:'rim',c:2,r:0,t:'TX',hp:95,atk:['Acid Spray','Tail Whip','Wing Charge'],dmg:[26,20,22]},
+  LEATHERBACK:{n:'Leatherback',e:'🦧',i:'rim',c:3,r:0,t:'ME',hp:115,atk:['EMP Blast','Gorilla Slam','Shell Bash'],dmg:[20,28,24],pass:{tp:'blkC',v:0.2}},
+  SLATTERN:{n:'Slattern',e:'🌊',i:'rim',c:4,r:0,t:'LI',hp:185,atk:['Tri-Tail Slam','Category Scream','Tsunami'],dmg:[36,40,34],boss:true},
+  SCUNNER:{n:'Scunner',e:'🐂',i:'rim',c:0,r:1,t:'PH',hp:100,atk:['Horn Gore','Bull Rush','Skull Smash'],dmg:[24,22,20]},
+  RAIJU:{n:'Raiju',e:'⚡',i:'rim',c:1,r:1,t:'LI',hp:90,atk:['Lightning Strike','Rapid Bite','Electric Surge'],dmg:[26,22,28]},
+  MUTAVORE:{n:'Mutavore',e:'🦏',i:'rim',c:2,r:1,t:'PH',hp:110,atk:['Wall Breach','Claw Rake','Charge'],dmg:[24,20,22]},
+  ONIBABA:{n:'Onibaba',e:'🦀',i:'rim',c:3,r:1,t:'PH',hp:95,atk:['Pincer Attack','Shell Cannon','Sand Storm'],dmg:[22,20,24]},
+  YAMARASHI:{n:'Yamarashi',e:'🦔',i:'rim',c:4,r:1,t:'PH',hp:100,atk:['Spine Barrage','Roll Tackle','Quake Stomp'],dmg:[20,24,22]},
+  MUTO:{n:'MUTO',e:'🕷️',i:'special',c:0,r:1,t:'FL',hp:75,atk:['EMP Pulse','Wing Strike','Pincer Jab'],dmg:[16,18,20]},
+  MUTO_PRIME:{n:'MUTO Prime',e:'🦂',i:'special',c:1,r:1,t:'PH',hp:145,atk:['Spine Spear','Body Slam','Sonic Pulse'],dmg:[30,28,26],boss:true},
+};
+const HERO_KEYS=['GODZILLA','MOTHRA','MECHAG','JAEGER','OTACHI','KONG'];
+const ALL_CATCH=Object.keys(MD).filter(k=>k!=='GODZILLA'&&!MD[k].bossOnly);
+const ENEMY_POOL=ALL_CATCH.filter(k=>!MD[k].boss);
+const BOSS_ORDER=['MUTO_PRIME','DESTOROYAH','SLATTERN','SPACEGZ','GHIDORAH'];
+const ARENAS=[
+  {n:'🏙️ CITY',bg:'linear-gradient(160deg,#1a1a2e,#16213e,#0f3460)'},
+  {n:'🌊 OCEAN',bg:'linear-gradient(160deg,#0d47a1,#01579b,#006064)'},
+  {n:'🌌 SPACE',bg:'linear-gradient(160deg,#0d0010,#1a0535,#0a0a1a)'},
+  {n:'🌋 VOLCANO',bg:'linear-gradient(160deg,#1a0a00,#4a1500,#7a2500)'},
+];
+
+// ===== QUESTIONS (2× EXPANDED) =====
+const usedQs={math:new Set(),read:new Set(),tri:new Set(),log:new Set(),eq:new Set()};
+function pickQ(pool,key){if(usedQs[key].size>=pool.length)usedQs[key].clear();const av=pool.map((_,i)=>i).filter(i=>!usedQs[key].has(i));const idx=av[~~(Math.random()*av.length)];usedQs[key].add(idx);return{...pool[idx],type:key};}
+const mathP=[[2,3,0],[5,4,0],[3,6,0],[4,4,0],[5,5,0],[3,7,0],[2,8,0],[4,5,0],[1,7,0],[6,3,0],[2,9,0],[4,6,0],[5,3,0],[7,2,0],[3,8,0],[1,9,0],[6,4,0],[8,2,0],[3,9,0],[7,3,0],[4,7,0],[5,6,0],[8,3,0],[6,5,0],[9,2,0],[4,8,0],[7,4,0],[3,3,0],[6,6,0],[9,1,0],[2,7,0],[8,1,0],[5,7,0],[6,7,0],[4,9,0],[7,3,1],[10,4,1],[8,5,1],[6,2,1],[9,3,1],[8,4,1],[7,2,1],[10,6,1],[9,5,1],[8,6,1],[11,4,1],[12,5,1],[10,3,1],[15,6,1],[12,4,1],[11,3,1],[14,5,1],[13,4,1],[16,7,1],[15,8,1],[18,9,1],[20,7,1],[19,6,1],[17,8,1],[14,6,1]];
+function mathQ(){if(usedQs.math.size>=mathP.length)usedQs.math.clear();const av=mathP.map((_,i)=>i).filter(i=>!usedQs.math.has(i));const idx=av[~~(Math.random()*av.length)];usedQs.math.add(idx);const[a,b,iS]=mathP[idx];const ans=iS?a-b:a+b,w1=ans>1?ans-1:ans+2,w2=ans+1;let o=[ans,w1,w2];for(let i=2;i>0;i--){const j=~~(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]];}return{q:`${a} ${iS?'-':'+'} ${b} = ?`,opts:o.map(String),a:o.indexOf(ans),type:'math'};}
+const QR=[
+  {e:'🔥',q:'What is this?',opts:['WATER','FIRE','WIND'],a:1},{e:'🌊',q:'What is this?',opts:['WAVE','ROCK','LEAF'],a:0},
+  {e:'⭐',q:'What is this?',opts:['SUN','MOON','STAR'],a:2},{e:'❄️',q:'What is this?',opts:['FIRE','WIND','ICE'],a:2},
+  {e:'⚡',q:'What is this?',opts:['THUNDER','WATER','FIRE'],a:0},{e:'🌋',q:'What is this?',opts:['HILL','ISLAND','VOLCANO'],a:2},
+  {e:'🦴',q:'What is this?',opts:['SHELL','BONE','ROCK'],a:1},{e:'👁️',q:'What is this?',opts:['EAR','EYE','NOSE'],a:1},
+  {e:'🐾',q:'What is this?',opts:['PAW PRINT','CLAW','TAIL'],a:0},{e:'🌪️',q:'What is this?',opts:['RAIN','TORNADO','CLOUD'],a:1},
+  {e:'💧',q:'Starts with W:',opts:['FIRE','WATER','ROCK'],a:1},{e:'🔴',q:'What color?',opts:['BLUE','GREEN','RED'],a:2},
+  {e:'🌙',q:'What is this?',opts:['SUN','MOON','STAR'],a:1},{e:'🌍',q:'What is this?',opts:['MARS','EARTH','MOON'],a:1},
+  {e:'🏔️',q:'What is this?',opts:['VOLCANO','HILL','MOUNTAIN'],a:2},{e:'🐚',q:'What is this?',opts:['ROCK','SHELL','BONE'],a:1},
+  {e:'💥',q:'What is this?',opts:['FIRE','BLAST','WAVE'],a:1},{e:'🌿',q:'Starts with L:',opts:['LEAF','ROOT','SEED'],a:0},
+  {e:'💎',q:'What is this?',opts:['STONE','GLASS','CRYSTAL'],a:2},{e:'🌑',q:'What is this?',opts:['SUN','EARTH','DARK MOON'],a:2},
+  {e:'🔵',q:'What color?',opts:['RED','BLUE','GREEN'],a:1},{e:'🦷',q:'What is this?',opts:['BONE','CLAW','TOOTH'],a:2},
+  {e:'⚫',q:'What color?',opts:['WHITE','GREY','BLACK'],a:2},{e:'🌠',q:'What is this?',opts:['COMET','SHOOTING STAR','MOON'],a:1},
+  {e:'🟢',q:'What color?',opts:['RED','GREEN','BLUE'],a:1},{e:'🌞',q:'What is this?',opts:['MOON','STAR','SUN'],a:2},
+  {e:'🌈',q:'What is this?',opts:['STORM','CLOUD','RAINBOW'],a:2},{e:'🌵',q:'What is this?',opts:['TREE','CACTUS','FLOWER'],a:1},
+  {e:'🧊',q:'What is this?',opts:['WATER','GLASS','ICE'],a:2},{e:'🔶',q:'What shape?',opts:['CIRCLE','DIAMOND','SQUARE'],a:1},
+  {e:'🦁',q:'What animal?',opts:['TIGER','BEAR','LION'],a:2},{e:'🐊',q:'What animal?',opts:['LIZARD','CROCODILE','SNAKE'],a:1},
+  {e:'🦈',q:'What animal?',opts:['DOLPHIN','WHALE','SHARK'],a:2},{e:'💀',q:'What is this?',opts:['GHOST','SKULL','BONE'],a:1},
+  {e:'🌧️',q:'What is this?',opts:['SNOW','HAIL','RAIN'],a:2},{e:'🟡',q:'What color?',opts:['ORANGE','GREEN','YELLOW'],a:2},
+  {e:'🐲',q:'What animal?',opts:['DINOSAUR','LIZARD','DRAGON'],a:2},{e:'❤️',q:'What is this?',opts:['DIAMOND','STAR','HEART'],a:2},
+  {e:'🔥',q:'Opposite of COLD:',opts:['WET','DARK','HOT'],a:2},{e:'🌙',q:'Starts with N:',opts:['NOON','NIGHT','DAY'],a:1},
+  {e:'🦋',q:'What animal?',opts:['BEE','BUTTERFLY','MOTH'],a:1},{e:'🐢',q:'What animal?',opts:['FROG','LIZARD','TURTLE'],a:2},
+  {e:'🦅',q:'What animal?',opts:['HAWK','EAGLE','FALCON'],a:1},{e:'⛰️',q:'What is this?',opts:['VOLCANO','MOUNTAIN','HILL'],a:1},
+  {e:'🌺',q:'What is this?',opts:['LEAF','FLOWER','FRUIT'],a:1},{e:'🦶',q:'What is this?',opts:['HAND','FOOT','ARM'],a:1},
+  {e:'🏖️',q:'What is this?',opts:['FOREST','BEACH','MOUNTAIN'],a:1},{e:'🌊',q:'Starts with O:',opts:['OCEAN','RIVER','LAKE'],a:0},
+];
+const QT=[
+  {q:"Godzilla shoots what\nfrom his mouth?",opts:['Fire','Atomic Breath','Water'],a:1},
+  {q:"Which monster is a giant moth?",opts:['Rodan','Ghidorah','Mothra'],a:2},
+  {q:"How many heads does\nKing Ghidorah have?",opts:['One','Two','Three'],a:2},
+  {q:"What is a Jaeger\nin Pacific Rim?",opts:['A kaiju','A robot','A ship'],a:1},
+  {q:"Which kaiju spits acid?",opts:['Otachi','Knifehead','Slattern'],a:0},
+  {q:"King Kong lives on\nwhich island?",opts:['Doom Island','Skull Island','Fire Island'],a:1},
+  {q:"Which kaiju uses EMP?",opts:['Raiju','Leatherback','Scunner'],a:1},
+  {q:"Godzilla is King of the...?",opts:['Robots','Monsters','Ocean'],a:1},
+  {q:"Slattern is which\nKaiju Category?",opts:['Category 3','Category 5','Category 4'],a:1},
+  {q:"Mothra fires what\nfrom her wings?",opts:['Water','Beams & dust','Fire'],a:1},
+  {q:"Rodan is a giant what?",opts:['Bat','Pterosaur','Eagle'],a:1},
+  {q:"What is Gigan known for?",opts:['Acid spit','Buzzsaw body','EMP'],a:1},
+  {q:"Pacific Rim Jaegers need\nhow many pilots?",opts:['One','Two','Three'],a:1},
+  {q:"MechaGodzilla is built\nfrom what?",opts:['Bone','Metal','Crystal'],a:1},
+  {q:"Biollante is a mix of\nGodzilla and what?",opts:['A rose','A tree','A whale'],a:0},
+  {q:"Hedorah is the\n___ Monster",opts:['Fire','Smog','Stone'],a:1},
+  {q:"SpaceGodzilla gets power\nfrom what?",opts:['Sun','Water','Crystals'],a:2},
+  {q:"What color are\nGodzilla's spines?",opts:['Red','Green','Blue'],a:2},
+  {q:"Destoroyah was created by\nwhich weapon?",opts:['A-bomb','Oxygen Destroyer','Nuke'],a:1},
+  {q:"Trespasser attacked\nwhich city first?",opts:['Tokyo','Sydney','San Francisco'],a:2},
+  {q:"Knifehead gets its name\nfrom its...",opts:['Teeth','Head shape','Claws'],a:1},
+  {q:"What universe is\nOtachi from?",opts:['MonsterVerse','Pacific Rim','Toho'],a:1},
+  {q:"Which monster can generate\nEMP fields?",opts:['Gigan','Raiju','Leatherback'],a:2},
+  {q:"MUTO eggs feed on\nwhich material?",opts:['Plants','Nuclear material','Fish'],a:1},
+  {q:"Mothra has how many\nlife stages?",opts:['Two','Three','One'],a:0},
+  {q:"Ghidorah comes from\nwhere?",opts:['Earth','Venus','Space'],a:2},
+  {q:"MechaGodzilla is also\ncalled?",opts:['Mechazilla','Kiryu','Iron G'],a:1},
+  {q:"What does 'Jaeger'\nmean in German?",opts:['Hunter','Fighter','Giant'],a:0},
+  {q:"Onibaba attacked\nwhich city?",opts:['San Francisco','Tokyo','Hong Kong'],a:1},
+  {q:"Raiju attacks with\nwhich element?",opts:['Fire','Lightning','Ice'],a:1},
+  {q:"What is the 'Drift'\nin Pacific Rim?",opts:['A weapon','Pilot mind-link','A move'],a:1},
+  {q:"Anguirus and Godzilla\nare usually?",opts:['Enemies','Allies','Rivals'],a:1},
+  {q:"Which monster destroyed\nthe Sydney seawall?",opts:['Slattern','Mutavore','Scunner'],a:1},
+  {q:"Leatherback's special\nability is?",opts:['Acid','EMP','Fire'],a:1},
+  {q:"Yamarashi resembles\nwhich animal?",opts:['Porcupine','Bear','Crab'],a:0},
+  {q:"Onibaba resembles\nwhich animal?",opts:['Crab','Spider','Mantis'],a:0},
+  {q:"What does MUTO stand for?",opts:['Massive Unidentified\nTerrestrial Organism','Monster\nUnder Ocean','Mutant\nUnknown Titan'],a:0},
+  {q:"Godzilla's atomic breath\nis which color?",opts:['Orange','Blue','White'],a:1},
+  {q:"Pacific Rim kaiju come\nthrough what?",opts:['A portal','The sky','Underground'],a:0},
+  {q:"Scunner has how\nmany horns?",opts:['One','Two','Three'],a:1},
+];
+const QL=[
+  {e:'🍎🍎🍎',q:"Godzilla has 3 apples.\nEats 1. How many left?",opts:['1','2','3'],a:1},
+  {e:'🔥🌊🔥🌊🔥',q:"What comes next?",opts:['🌊','🔥','⭐'],a:0},
+  {e:'🦖🦖🦖🦖',q:"4 monsters, 1 leaves.\nHow many stay?",opts:['2','3','4'],a:1},
+  {e:'⭐⭐⭐⭐⭐',q:"5 stars, spent 2.\nHow many left?",opts:['2','3','4'],a:1},
+  {e:'🟥🟦🟥🟦🟥',q:"What color comes next?",opts:['🟥','🟦','🟨'],a:1},
+  {e:'🦖🦖',q:"2 monsters + 3 more.\nHow many total?",opts:['4','5','6'],a:1},
+  {e:'💧💧💧💧',q:"4 drops + 3 more = ?",opts:['6','7','8'],a:1},
+  {e:'🍎🍊🍎🍊',q:"What comes next?",opts:['🍋','🍎','🍊'],a:2},
+  {e:'🟦🟦🟦🟩🟩',q:"3 blue + 2 green = ?",opts:['4','5','6'],a:1},
+  {e:'🦖🦖🦖🦖🦖',q:"5 kaiju minus 3 = ?",opts:['1','2','3'],a:1},
+  {e:'🔴🔵🔴🔵🔴🔵',q:"What comes next?",opts:['🔴','🔵','🟡'],a:0},
+  {e:'🌟🌟🌟',q:"3 stars + 4 more = ?",opts:['6','7','8'],a:1},
+  {e:'🦖',q:"Godzilla has 10 HP.\nLoses 4. HP now?",opts:['5','6','7'],a:1},
+  {e:'🍪🍪🍪🍪🍪🍪',q:"6 cookies for 2 friends,\neach gets?",opts:['2','3','4'],a:1},
+  {e:'⬛⬜⬛⬜⬛',q:"What comes next?",opts:['⬛','⬜','🟨'],a:1},
+  {e:'🌙🌙🌙',q:"3 moons × 2 = ?",opts:['5','6','7'],a:1},
+  {e:'🏆🏆',q:"Won 2 today + 3 yesterday = ?",opts:['4','5','6'],a:1},
+  {e:'🦷🦷🦷🦷🦷🦷🦷🦷',q:"8 teeth, loses 3.\nHow many left?",opts:['4','5','6'],a:1},
+  {e:'🌟🌟🌟🌟',q:"4 stars + 5 = ?",opts:['8','9','10'],a:1},
+  {e:'🍎🍎🍎🍎🍎',q:"5 apples shared\nbetween 5 friends = ?",opts:['1 each','2 each','3 each'],a:0},
+  {e:'🦖',q:"Godzilla walks 5 steps\nback 2. Where is he?",opts:['Step 2','Step 3','Step 4'],a:1},
+  {e:'🍪🍪🍪🍪🍪🍪🍪🍪',q:"8 cookies, ate 3.\nHow many left?",opts:['4','5','6'],a:1},
+  {e:'🔢',q:"What comes after 9?",opts:['8','10','11'],a:1},
+  {e:'🌊🌊🌊🌊🌊🌊🌊',q:"7 waves, 4 calm down.\nHow many left?",opts:['2','3','4'],a:1},
+  {e:'🟥🟥🟦🟥🟥🟦',q:"What comes next?",opts:['🟥','🟦','🟩'],a:0},
+  {e:'🦴🦴🦴',q:"3 bones × 3 = ?",opts:['6','8','9'],a:2},
+  {e:'⭐⭐⭐⭐⭐⭐⭐',q:"7 stars + 4 more = ?",opts:['10','11','12'],a:1},
+  {e:'🍕🍕🍕🍕',q:"4 pizzas for 2.\nEach gets?",opts:['1','2','3'],a:1},
+  {e:'🔴🔵🟢🔴🔵',q:"What comes next?",opts:['🔴','🟢','🔵'],a:2},
+  {e:'🏆🏆',q:"Win 2 per day for\n3 days = ?",opts:['4','6','8'],a:1},
+  {e:'🦖🦖🦖',q:"3 kaiju + 4 more = ?",opts:['6','7','8'],a:1},
+  {e:'🌙🌙',q:"2 moons tonight,\n3 more appear. Total?",opts:['4','5','6'],a:1},
+  {e:'🐉🐉🐉🐉🐉🐉🐉🐉🐉🐉',q:"10 kaiju, half sleep.\nHow many awake?",opts:['4','5','6'],a:1},
+  {e:'🍎🍊🍋🍎🍊',q:"What comes next?",opts:['🍋','🍎','🍊'],a:0},
+  {e:'🦷🦷',q:"2 + 2 + 2 = ?",opts:['5','6','7'],a:1},
+  {e:'⭐⭐',q:"Stars: 2 earned,\nspent 1. How many left?",opts:['0','1','2'],a:1},
+];
+const QE=[
+  {e:'👫',q:"Your friend looks sad.\nYou should...",opts:['Talk to them','Ignore them','Laugh at them'],a:0},
+  {e:'🎁',q:"Friend forgot lunch.\nYou should...",opts:['Eat alone','Share your food','Take their bag'],a:1},
+  {e:'📚',q:"Want to play but have\nhomework. You should...",opts:['Play first!','Finish homework first','Skip homework'],a:1},
+  {e:'🧹',q:"You made a mess.\nWhat do you do?",opts:['Leave it','Clean it up','Blame a friend'],a:1},
+  {e:'🐾',q:"Your pet needs feeding.\nYou should...",opts:['Feed it first','Forget it','Ask someone else'],a:0},
+  {e:'💔',q:"You broke something.\nYou should...",opts:['Hide it','Tell the truth','Blame someone else'],a:1},
+  {e:'😢',q:"You feel sad. Best\nthing to do is...",opts:['Keep it secret','Talk to someone','Cry alone forever'],a:1},
+  {e:'😡',q:"You feel angry.\nYou should...",opts:['Hit someone','Take deep breaths','Scream at everyone'],a:1},
+  {e:'🦁',q:"Scared to try something new.\nYou...",opts:['Give up right away','Try your best','Hide forever'],a:1},
+  {e:'🤝',q:"Someone is being bullied.\nYou should...",opts:['Join the bully','Tell a trusted adult','Walk away'],a:1},
+  {e:'🎮',q:"Friend wants a turn\nwith your toy. You...",opts:['Never share','Share & take turns','Hide your toy'],a:1},
+  {e:'🌧️',q:"A friend is crying.\nYou...",opts:['Comfort them','Laugh','Walk away'],a:0},
+  {e:'⏰',q:"You promised to help\na friend. You should...",opts:['Forget about it','Keep your promise','Make an excuse'],a:1},
+  {e:'🏆',q:"You won, friend lost.\nYou...",opts:['Brag and tease','Be kind','Ignore your friend'],a:1},
+  {e:'🙏',q:"Someone helps you.\nYou say...",opts:['Nothing','Thank you','Walk away'],a:1},
+  {e:'🤧',q:"A friend is sick.\nYou...",opts:['Make fun of them','Ask if they need help','Stay far away'],a:1},
+  {e:'📖',q:"You find reading hard.\nYou should...",opts:['Give up','Practice every day','Pretend you can'],a:1},
+  {e:'🌱',q:"You want to be better\nat something. You...",opts:['Give up fast','Keep trying daily','Cheat instead'],a:1},
+  {e:'👂',q:"Someone is talking\nto you. You should...",opts:['Listen carefully','Look at your phone','Talk over them'],a:0},
+  {e:'🤲',q:"A new student arrives.\nYou...",opts:['Ignore them','Welcome them','Make fun of them'],a:1},
+  {e:'🎂',q:"It's your friend's birthday.\nYou...",opts:['Ignore it','Say Happy Birthday!','Ask for gifts'],a:1},
+  {e:'🌟',q:"You did something great!\nYou should...",opts:['Be proud quietly','Brag to everyone','Pretend you didn\'t'],a:0},
+  {e:'🏃',q:"You see someone fall.\nYou...",opts:['Run away','Help them up','Laugh at them'],a:1},
+  {e:'📱',q:"A friend shares something\nprivate. You...",opts:['Tell everyone','Keep it secret','Post online'],a:1},
+  {e:'🌊',q:"You make a mistake.\nYou should...",opts:['Deny it','Apologize & fix it','Blame others'],a:1},
+  {e:'💪',q:"A task seems impossible.\nYou...",opts:['Quit immediately','Try your best','Cheat'],a:1},
+  {e:'🤝',q:"Two friends argue.\nYou should...",opts:['Join one side','Help them talk','Ignore them'],a:1},
+  {e:'🌺',q:"Someone looks different\nfrom you. You...",opts:['Make fun of them','Be friendly & kind','Ignore them'],a:1},
+  {e:'😴',q:"Very tired at school.\nYou should...",opts:['Sleep in class','Tell the teacher','Give up learning'],a:1},
+  {e:'🎈',q:"At a party, don't know\nanyone. You...",opts:['Cry alone','Introduce yourself','Go home immediately'],a:1},
+  {e:'🧩',q:"A task is very hard.\nYou...",opts:['Give up','Ask for help','Copy a friend'],a:1},
+  {e:'🌈',q:"You feel scared before\na big test. You...",opts:['Don\'t try','Breathe & try your best','Cheat'],a:1},
+  {e:'🎵',q:"Your sibling wants to\nwatch a different show. You...",opts:['Argue loudly','Take turns choosing','Cry until you win'],a:1},
+  {e:'🌍',q:"You see trash on the\nground. You...",opts:['Ignore it','Pick it up','Throw more trash'],a:1},
+  {e:'🤗',q:"A friend is nervous.\nYou...",opts:['Tease them','Encourage them','Ignore them'],a:1},
+  {e:'🕐',q:"You are running late.\nYou should...",opts:['Blame the traffic','Apologize & explain','Lie about it'],a:1},
+  {e:'🎯',q:"You keep missing a goal.\nYou...",opts:['Quit forever','Practice more','Cheat'],a:1},
+  {e:'💬',q:"A friend asks for advice.\nYou...",opts:['Ignore them','Listen and help','Tell everyone'],a:1},
+  {e:'🌙',q:"Bedtime, but you want\nto play more. You...",opts:['Stay up all night','Sleep & play tomorrow','Cry until midnight'],a:1},
+  {e:'🦮',q:"You forgot your homework.\nYou should...",opts:['Lie about it','Tell the truth & apologize','Copy a friend\'s'],a:1},
+];
+
+// ===== GAME STATE =====
+let gs={name:'',roster:['GODZILLA'],caught:[],stars:0,wins:0,bossIdx:0,heroKey:'GODZILLA',enemyKey:null,heroHp:0,heroMaxHp:0,enemyHp:0,enemyMaxHp:0,arenaIdx:0,rageStreak:0,rage:false,shield:false,powerUp:false,potionActive:false,isBoss:false,active:false,pendingBoss:false,pass:{hpB:0,atkB:0,starsX:1,healC:0,eRed:0,blkC:0}};
+let bLock=false;
+async function saveG(){try{await window.localStorage.setItem('kaijuv7',JSON.stringify({name:gs.name,roster:gs.roster,caught:gs.caught,stars:gs.stars,wins:gs.wins,bossIdx:gs.bossIdx}));}catch(e){}}
+async function loadG(){
+  try{const d=JSON.parse(localStorage.getItem('kaijuv7')||'{}');if(d.name)Object.assign(gs,{name:d.name||'',roster:d.roster||['GODZILLA'],caught:d.caught||[],stars:d.stars||0,wins:d.wins||0,bossIdx:d.bossIdx||0});}catch(e){}
+  await preloadImgs();
+  show(gs.name?'title':'nameInput');
+}
+function calcP(){const p={hpB:0,atkB:0,starsX:1,healC:0,eRed:0,blkC:0};gs.caught.forEach(k=>{const m=MD[k];if(!m||!m.pass)return;const{tp,v}=m.pass;if(tp==='hpB')p.hpB+=v;if(tp==='atkB')p.atkB+=v;if(tp==='starsX')p.starsX=Math.min(p.starsX*v,3);if(tp==='healC')p.healC+=v;if(tp==='eRed')p.eRed+=v;if(tp==='blkC')p.blkC=Math.min(p.blkC+v,.5);});gs.pass=p;}
+let ac=null;
+function snd(t){try{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);const ct=ac.currentTime,c={ok:[523,784,.3,'sine'],no:[220,140,.3,'sawtooth'],hit:[90,50,.2,'square'],win:[523,700,.6,'sine'],boss:[55,41,.9,'sawtooth'],pot:[400,600,.3,'sine']}[t]||[200,100,.2,'square'];o.type=c[3];o.frequency.setValueAtTime(c[0],ct);o.frequency.exponentialRampToValueAtTime(c[1],ct+c[2]);g.gain.setValueAtTime(.25,ct);g.gain.exponentialRampToValueAtTime(.001,ct+c[2]);o.start(ct);o.stop(ct+c[2]);}catch(e){}}
+
+// ===== SCREENS =====
+const SCRS={nameInput:rName,title:rTitle,heroSelect:rHeroes,shop:rShop,bossChoice:rBossChoice,battle:rBattle,catch:rCatch,dex:rDex,gameover:rGameOver};
+function show(s){$('app').innerHTML='';SCRS[s]&&SCRS[s]();}
+function rName(){$('app').innerHTML=`<div class="scr" style="background:radial-gradient(ellipse at center,#0d0d2e,#08081a)"><div class="logo" style="margin-bottom:16px">KAIJU<br>ACADEMY</div><div style="font-size:8px;color:#aaa;margin-bottom:16px">Enter your name, Titan Trainer!</div><input class="pixinput" id="pname" maxlength="12" placeholder="YOUR NAME"><br><button class="btn y" style="font-size:10px;padding:11px 16px;margin-top:12px" onclick="submitName()">▶ START!</button></div>`;$('pname').value=gs.name;$('pname').addEventListener('keydown',e=>{if(e.key==='Enter')submitName();});setTimeout(()=>$('pname')&&$('pname').focus(),100);}
+function submitName(){const v=$('pname').value.trim();if(!v)return;gs.name=v;saveG();show('title');}
+function rTitle(){const wL=5-(gs.wins%5)||5,bK=BOSS_ORDER[gs.bossIdx%BOSS_ORDER.length];$('app').innerHTML=`<div class="scr" style="background:radial-gradient(ellipse at center,#0d0d2e,#08081a)"><div class="logo" style="font-size:15px;margin-bottom:6px">KAIJU<br>ACADEMY</div><div style="font-size:7px;color:#aaa;margin-bottom:8px">Welcome, ${gs.name}!</div><div style="font-size:8px;color:#f1c40f;margin-bottom:3px">⭐ ${gs.stars} STARS</div><div style="font-size:6px;color:#aaa;margin-bottom:3px">${gs.caught.length} / ${ALL_CATCH.length} MONSTERS CAUGHT</div><div style="font-size:6px;color:#e74c3c;margin-bottom:12px">⚠️ BOSS in ${wL} win${wL!==1?'s':''}: ${MD[bK].e} ${MD[bK].n}</div>${sprHtml('GODZILLA',64)}<button class="btn y" style="font-size:10px;padding:11px 16px;margin-top:12px" onclick="show('heroSelect')">⚔️ BATTLE!</button><button class="btn b" onclick="show('dex')">📖 DEX</button><button class="btn gr" style="font-size:7px" onclick="show('nameInput')">✏️ NAME</button></div>`;}
+function rHeroes(){
+  const playable=gs.roster.filter(k=>!MD[k].bossOnly);
+  const locked=HERO_KEYS.filter(k=>k!=='GODZILLA'&&!gs.roster.includes(k));
+  let html=playable.map(k=>`<div class="hcard" onclick="selHero('${k}')"><div style="display:flex;justify-content:center">${sprHtml(k,76)}</div><div style="font-size:5px;color:#f1c40f;margin-top:3px">${MD[k].n}</div><div style="font-size:4.5px;color:#27ae60">HP:${MD[k].hp}</div></div>`).join('');
+  html+=locked.map(k=>`<div class="hcard locked"><div style="display:flex;justify-content:center;opacity:.3">${sprHtml(k,76)}</div><div style="font-size:5px;color:#333;margin-top:3px">${MD[k].n}</div><div style="font-size:4px;color:#333">🔒 CATCH TO UNLOCK</div></div>`).join('');
+  $('app').innerHTML=`<div class="scr" style="background:#0a0a1a;justify-content:flex-start;padding-top:12px"><div style="font-size:10px;color:#f1c40f;margin-bottom:10px;font-weight:bold">CHOOSE YOUR FIGHTER!</div><div class="hgrid">${html}</div><button class="btn gr" style="margin-top:12px" onclick="show('title')">BACK</button></div>`;
+}
+function selHero(k){gs.heroKey=k;show('shop');}
+function rShop(){
+  const m=MD[gs.heroKey],s=gs.stars,isBossNext=gs.pendingBoss;
+  const itm=(ico,nm,dc,pr,col,cb,dis,act)=>`<div class="pbox" style="margin:4px;text-align:left;max-width:215px;width:100%"><div style="font-size:8px">${ico} ${nm}${act?' ✅':''}</div><div style="font-size:5.5px;color:#aaa;margin-top:2px">${dc}</div><div style="font-size:7px;color:#f1c40f;margin-top:2px">${pr}</div><button class="btn ${col}" style="margin-top:5px;font-size:7px" onclick="${cb}" ${dis?'disabled':''}>BUY</button></div>`;
+  $('app').innerHTML=`<div class="scr" style="background:#0a0a1a"><div style="font-size:10px;color:#f1c40f;margin-bottom:7px;font-weight:bold">⭐ STAR SHOP</div><div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:10px">${sprHtml(gs.heroKey,50)}<div><div style="font-size:7px;color:#aaa">${m.n}</div><div style="font-size:7px;color:#f1c40f">Stars: ${s} ⭐</div></div></div>${itm('🧪','Health Potion','+30 HP during battle','10 ⭐','teal',"buyI('potion')",s<10||gs.potionActive,gs.potionActive)}${itm('🛡️','Shield','Block 1 enemy attack','15 ⭐','b',"buyI('shield')",s<15||gs.shield,gs.shield)}${itm('⚡','Power Up','Next attack +50% dmg','20 ⭐','r',"buyI('powerup')",s<20||gs.powerUp,gs.powerUp)}<button class="btn y" style="font-size:10px;padding:11px 16px;margin-top:12px" onclick="${isBossNext?'goBoss()':'startBattle()'}">${isBossNext?'💀 FACE THE BOSS!':'⚔️ FIGHT!'}</button><button class="btn gr" onclick="show('heroSelect')">BACK</button></div>`;
+}
+function buyI(t){if(t==='potion'&&gs.stars>=10&&!gs.potionActive){gs.stars-=10;gs.potionActive=true;}if(t==='shield'&&gs.stars>=15&&!gs.shield){gs.stars-=15;gs.shield=true;}if(t==='powerup'&&gs.stars>=20&&!gs.powerUp){gs.stars-=20;gs.powerUp=true;}saveG();rShop();}
+function goBoss(){gs.pendingBoss=false;show('bossChoice');}
+function startBattle(){
+  calcP();bLock=false;gs.rageStreak=0;gs.rage=false;gs.isBoss=false;gs.active=true;
+  const base=MD[gs.heroKey].hp+gs.pass.hpB;gs.heroHp=base;gs.heroMaxHp=base;
+  gs.enemyKey=ENEMY_POOL[~~(Math.random()*ENEMY_POOL.length)];
+  gs.enemyHp=MD[gs.enemyKey].hp;gs.enemyMaxHp=gs.enemyHp;
+  gs.arenaIdx=(gs.arenaIdx+1)%ARENAS.length;rBattle();
+}
+function rBattle(){
+  const hero=MD[gs.heroKey],enemy=MD[gs.enemyKey],ar=ARENAS[gs.arenaIdx];
+  const hP=Math.max(0,Math.min(100,(gs.heroHp/gs.heroMaxHp)*100));
+  const eP=Math.max(0,(gs.enemyHp/gs.enemyMaxHp)*100);
+  const hC=hP>50?'#27ae60':hP>25?'#e67e22':'#e74c3c',eC=eP>50?'#27ae60':eP>25?'#e67e22':'#e74c3c';
+  const wL=5-(gs.wins%5)||5;
+  const btns=hero.atk.map((a,i)=>`<button class="btn ${['r','b','g'][i]}" style="font-size:8px" onclick="pickAtk(${i})" ${gs.active?'':'disabled'}>${a}</button>`).join('');
+  $('app').innerHTML=`<div style="background:#0b1020;min-height:100vh;display:flex;flex-direction:column;padding:7px">
+    <div style="display:flex;justify-content:space-between;font-size:6px;color:#666;margin-bottom:5px"><span>${ar.n}${gs.isBoss?' 💀 BOSS':''}</span><span style="color:#f1c40f">⭐${gs.stars}</span><span>🏆${gs.wins} Boss:${wL}</span></div>
+    <div class="arena" id="arena" style="background:${ar.bg}${gs.isBoss?';border-color:#e74c3c':''}">
+      <div style="text-align:center"><div style="font-size:6px;color:#e74c3c;margin-bottom:3px">${enemy.n}</div><div class="hpbar" style="width:140px"><div class="hpfill" style="width:${eP}%;background:${eC}"></div></div><div style="font-size:5px;color:#888;margin-top:1px">${gs.enemyHp}/${gs.enemyMaxHp}</div>${sprHtml(gs.enemyKey,95,'espr')}</div>
+      <div style="text-align:center"><div style="font-size:6px;color:#27ae60;margin-bottom:3px">${hero.n}</div><div class="hpbar" style="width:140px"><div class="hpfill" style="width:${hP}%;background:${hC}"></div></div><div style="font-size:5px;color:#888;margin-top:1px">${gs.heroHp}/${gs.heroMaxHp}</div>${sprHtml(gs.heroKey,95,'hspr',true)}</div>
+    </div>
+    ${gs.rage?'<div class="rage">🔥 RAGE MODE! 2x DAMAGE! 🔥</div>':''}
+    <div class="log" id="log">⚔️ ${enemy.n} appears! Choose an attack!</div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin:5px 0">${btns}</div>
+    <div style="display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-bottom:4px">${gs.potionActive?`<button class="btn teal" style="font-size:7px" onclick="usePotion()">🧪 USE POTION (+30 HP)</button>`:''} ${gs.shield?'<span style="font-size:6px;color:#2471a3;padding:4px">🛡️ SHIELD</span>':''} ${gs.powerUp?'<span style="font-size:6px;color:#e74c3c;padding:4px">⚡ POWER UP</span>':''}</div>
+    <div style="display:flex;justify-content:center;gap:6px"><button class="btn g" style="font-size:7px" onclick="doSave()">💾 SAVE</button><button class="btn gr" style="font-size:7px" onclick="exitBattle()">🏠 MENU</button></div>
+  </div>`;
+}
+function usePotion(){if(!gs.potionActive)return;const h=Math.min(30,gs.heroMaxHp-gs.heroHp);gs.heroHp=Math.min(gs.heroHp+30,gs.heroMaxHp);gs.potionActive=false;snd('pot');setLog(`🧪 Potion used! +${h} HP!`);setTimeout(rBattle,600);}
+function doSave(){saveG();const l=$('log');if(l)l.textContent='💾 Game saved!';}
+function setLog(t){const l=$('log');if(l)l.textContent=t;}
+function pickAtk(i){if(!gs.active||bLock)return;bLock=true;gs.pendAtk=i;showQ('battle');}
+function animSpr(id,isAtk){const el=$(id);if(!el)return;el.classList.remove('shk','atkA');void el.offsetWidth;el.classList.add(isAtk?'atkA':'shk');setTimeout(()=>el&&el.classList.remove('shk','atkA'),500);}
+function showFx(type,side){const arena=$('arena');if(!arena)return;const fx=document.createElement('div');fx.className=`fx fx-${side==='e'?'e'+type:type}`;arena.appendChild(fx);setTimeout(()=>fx.parentNode&&fx.remove(),720);if(type==='PH'){arena.classList.remove('sshk');void arena.offsetWidth;arena.classList.add('sshk');setTimeout(()=>arena&&arena.classList.remove('sshk'),400);}}
+function heroAtks(){
+  const hero=MD[gs.heroKey];let dmg=hero.dmg[gs.pendAtk]+gs.pass.atkB;
+  if(gs.rage){dmg=Math.round(dmg*2);gs.rage=false;gs.rageStreak=0;}
+  if(gs.powerUp){dmg=Math.round(dmg*1.5);gs.powerUp=false;}
+  gs.enemyHp=Math.max(0,gs.enemyHp-dmg);if(gs.enemyHp<=0)gs.active=false;
+  animSpr('hspr',true);setTimeout(()=>animSpr('espr',false),200);showFx(hero.t,'h');snd('hit');
+  if(gs.pass.healC>0)gs.heroHp=Math.min(gs.heroHp+gs.pass.healC,gs.heroMaxHp);
+  gs.stars+=Math.round(1*gs.pass.starsX);
+  setTimeout(()=>{rBattle();if(gs.enemyHp<=0)setTimeout(winBattle,800);else{setTimeout(enemyAtks,900);bLock=false;}},600);
+}
+function enemyAtks(){
+  if(!gs.active)return;const enemy=MD[gs.enemyKey];
+  let dmg=Math.round(enemy.dmg[~~(Math.random()*3)]*(gs.isBoss?1.5:1))+~~(Math.random()*4)-Math.min(gs.pass.eRed,4);dmg=Math.max(1,dmg);
+  if(gs.shield){gs.shield=false;setLog(`🛡️ Shield blocked ${enemy.n}!`);setTimeout(()=>{rBattle();bLock=false;},700);return;}
+  if(Math.random()<gs.pass.blkC){setLog(`🛡️ Blocked!`);setTimeout(()=>{rBattle();bLock=false;},700);return;}
+  gs.heroHp=Math.max(0,gs.heroHp-dmg);if(gs.heroHp<=0)gs.active=false;
+  animSpr('espr',true);setTimeout(()=>animSpr('hspr',false),200);showFx(enemy.t,'e');snd('hit');
+  setLog(`🔴 ${enemy.n} hits! -${dmg} HP!`);
+  setTimeout(()=>{rBattle();if(gs.heroHp<=0)setTimeout(loseBattle,800);else bLock=false;},600);
+}
+function counterAtk(){setLog(`❌ Wrong! ${MD[gs.enemyKey].n} attacks!`);setTimeout(enemyAtks,900);}
+function winBattle(){
+  gs.active=false;bLock=false;const iB=gs.isBoss;
+  const earned=Math.round((iB?12:3)*gs.pass.starsX);gs.stars+=earned;gs.wins++;if(iB)gs.bossIdx++;
+  saveG();snd('win');setLog((iB?'🏆 BOSS DEFEATED! ':'🎉 Victory! ')+`+${earned} ⭐`);
+  setTimeout(()=>{gs.isBoss=false;if(!iB&&gs.wins%5===0){gs.pendingBoss=true;show('heroSelect');}else rCatch();},1500);
+}
+function loseBattle(){gs.active=false;bLock=false;saveG();rGameOver();}
+function exitBattle(){gs.active=false;bLock=false;gs.shield=false;gs.powerUp=false;gs.potionActive=false;gs.pendingBoss=false;show('title');}
+function rBossChoice(){
+  const bK=BOSS_ORDER[gs.bossIdx%BOSS_ORDER.length];snd('boss');
+  $('app').innerHTML=`<div class="scr" style="background:radial-gradient(ellipse,#2a0010,#08081a)"><div style="font-size:10px;color:#e74c3c;animation:bob 1s infinite;margin-bottom:8px;font-weight:bold">💀 BOSS BATTLE!</div><div style="font-size:8px;margin-bottom:4px">Facing: ${MD[bK].e} ${MD[bK].n}</div><div style="font-size:5.5px;color:#aaa;margin-bottom:14px">Boss HP: ${MD[bK].hp*3} | Extra strong attacks!</div><div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><div class="pbox" style="cursor:pointer;border-color:#9b59b6;max-width:148px;text-align:center" onclick="startBoss('EVOGZ')">${sprHtml('EVOGZ',90)}<div style="font-size:7px;color:#9b59b6;margin-top:5px;font-weight:bold">EVOLVED</div><div style="font-size:4.5px;color:#aaa">HP:200 | Balanced</div></div><div class="pbox" style="cursor:pointer;border-color:#e74c3c;max-width:148px;text-align:center" onclick="startBoss('BURNGZ')">${sprHtml('BURNGZ',90)}<div style="font-size:7px;color:#e74c3c;margin-top:5px;font-weight:bold">BURNING</div><div style="font-size:4.5px;color:#aaa">HP:190 | Max ATK</div></div></div><button class="btn gr" style="margin-top:14px;font-size:7px" onclick="show('title')">SKIP FOR NOW</button></div>`;
+}
+function startBoss(fK){
+  calcP();bLock=false;const form=MD[fK];gs.heroKey=fK;gs.heroHp=form.hp;gs.heroMaxHp=form.hp;
+  gs.isBoss=true;gs.rageStreak=0;gs.rage=false;gs.active=true;gs.pendingBoss=false;
+  const bK=BOSS_ORDER[gs.bossIdx%BOSS_ORDER.length];
+  gs.enemyKey=bK;gs.enemyHp=MD[bK].hp*3;gs.enemyMaxHp=MD[bK].hp*3;
+  gs.arenaIdx=(gs.arenaIdx+1)%ARENAS.length;rBattle();
+}
+function rCatch(){
+  const k=gs.enemyKey;if(!k||!MD[k]){show('heroSelect');return;}
+  const m=MD[k],already=gs.caught.includes(k);
+  $('app').innerHTML=`<div class="scr" style="background:rgba(0,0,0,.97)"><div style="font-size:10px;color:#f1c40f;margin-bottom:6px;font-weight:bold">⚡ WILD KAIJU!</div><div style="animation:bob 1s infinite;display:inline-block;margin:4px 0">${sprHtml(k,110)}</div><div style="font-size:9px;margin:10px 0 3px;font-weight:bold">${m.e} ${m.n}</div><div style="font-size:6px;color:#888;margin-bottom:12px">${already?'Already caught! Bonus stars!':m.n+' wants to join you!'}</div><button class="btn g" style="font-size:9px" onclick="attemptCatch()">⚡ CATCH IT!</button><button class="btn gr" style="font-size:7px" onclick="afterCatch()">SKIP</button></div>`;
+}
+function attemptCatch(){showQ('catch');}
+function doCatch(){const k=gs.enemyKey,isNew=!gs.caught.includes(k);if(isNew){gs.caught.push(k);if(!gs.roster.includes(k))gs.roster.push(k);}const bonus=Math.round((isNew?5:2)*gs.pass.starsX);gs.stars+=bonus;saveG();snd('win');$('app').innerHTML=`<div class="scr" style="background:#08081a"><div style="font-size:40px;animation:bob 1s infinite">🎉</div><div style="font-size:10px;color:#27ae60;margin:10px 0;font-weight:bold">${MD[k].n} CAUGHT!</div><div style="display:inline-block;margin:4px 0">${sprHtml(k,90)}</div>${isNew?`<div style="font-size:6px;color:#aaa;margin-top:8px">Added to your roster!</div>`:''}<div style="font-size:8px;color:#f1c40f;margin-top:6px">+${bonus} ⭐</div><button class="btn y" style="margin-top:12px;font-size:9px" onclick="afterCatch()">CONTINUE ▶</button></div>`;}
+function missedCatch(){$('app').innerHTML=`<div class="scr" style="background:#08081a"><div style="font-size:40px">💨</div><div style="font-size:9px;color:#e74c3c;margin:10px 0">${MD[gs.enemyKey]?.n||''} got away!</div><button class="btn y" style="margin-top:12px" onclick="afterCatch()">CONTINUE ▶</button></div>`;}
+function afterCatch(){show('heroSelect');}
+function rGameOver(){const hero=MD[gs.heroKey];$('app').innerHTML=`<div class="scr" style="background:#0a0000"><div style="font-size:18px;color:#e74c3c;text-shadow:3px 3px 0 #000;margin-bottom:10px;font-weight:bold">💀 K.O.!</div><div style="opacity:.4;display:inline-block">${sprHtml(gs.heroKey,82)}</div><div style="font-size:8px;color:#aaa;margin:12px 0;line-height:2.2">${hero.n} was defeated!<br>Stars: ${gs.stars} ⭐<br>Wins: ${gs.wins}<br>Caught: ${gs.caught.length}/${ALL_CATCH.length}</div><button class="btn y" onclick="show('heroSelect')">⚔️ TRY AGAIN</button><button class="btn gr" onclick="exitBattle()">🏠 MENU</button></div>`;}
+function rDex(){const cards=ALL_CATCH.map(k=>{const m=MD[k],got=gs.caught.includes(k),play=got&&gs.roster.includes(k);return`<div class="mcard ${got?(play?'play':'got'):'no'}"><div style="display:flex;justify-content:center">${sprHtml(k,48)}</div><div class="mname">${got?m.n:'???'}</div></div>`;}).join('');$('app').innerHTML=`<div class="scr" style="background:#08081a;justify-content:flex-start;padding-top:12px;overflow-y:auto;max-height:100vh"><div style="font-size:10px;color:#f1c40f;margin-bottom:4px;font-weight:bold">📖 MONSTER DEX</div><div style="font-size:6px;color:#888;margin-bottom:5px">${gs.caught.length} / ${ALL_CATCH.length} CAUGHT</div><div style="font-size:5px;color:#888;margin-bottom:8px">🟡=caught | 🟢=playable | ⬛=locked</div><div class="dgrid">${cards}</div><button class="btn gr" style="margin-top:10px;margin-bottom:16px" onclick="show('title')">BACK</button></div>`;}
+
+// ===== QUESTIONS =====
+let qCtx=null,curQ=null;
+const BADGES={math:'🔢 MATH BATTLE',read:'📖 READING FLASH',tri:'🦖 KAIJU TRIVIA',log:'🧩 LOGIC QUEST',eq:'💛 HEART CHECK'};
+function showQ(ctx){qCtx=ctx;const types=['math','read','tri','log','eq'],type=types[~~(Math.random()*types.length)];if(type==='math')curQ=mathQ();else if(type==='read')curQ=pickQ(QR,'read');else if(type==='tri')curQ=pickQ(QT,'tri');else if(type==='log')curQ=pickQ(QL,'log');else curQ=pickQ(QE,'eq');$('qbadge').textContent=BADGES[type];$('qtxt').textContent=curQ.q;$('qfb').textContent='';const re=$('remo');if(curQ.e){re.textContent=curQ.e;re.style.display='block';}else re.style.display='none';const oa=$('aopts');oa.innerHTML='';curQ.opts.forEach((o,i)=>{const b=document.createElement('button');b.className='abtn';b.textContent=o;b.onclick=()=>ansQ(i,b,oa);oa.appendChild(b);});$('qmod').classList.add('on');}
+function ansQ(i,btn,oa){const ok=i===curQ.a;oa.querySelectorAll('.abtn').forEach(b=>b.disabled=true);btn.classList.add(ok?'ok':'no');if(!ok)oa.querySelectorAll('.abtn')[curQ.a].classList.add('ok');$('qfb').textContent=ok?'✅ CORRECT! Amazing!':'❌ Not quite — keep trying!';snd(ok?'ok':'no');if(ok){gs.rageStreak++;if(gs.rageStreak>=3){gs.rage=true;gs.rageStreak=0;}}else gs.rageStreak=0;setTimeout(()=>{$('qmod').classList.remove('on');if(qCtx==='battle'){ok?heroAtks():counterAtk();}else if(qCtx==='catch'){ok?doCatch():missedCatch();}},1400);}
+
+loadG();
+</script>
+</body>
+</html>
