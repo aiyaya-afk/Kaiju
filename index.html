@@ -158,8 +158,8 @@ const MD={
   JAEGER:{n:'Jaeger',e:'⚙️',i:'heroes',c:0,r:1,t:'ME',hp:125,atk:['🔵 Plasma Cannon','🚀 Elbow Rocket','⚔️ Sword Slash'],dmg:[24,22,20]},
   OTACHI:{n:'Otachi',e:'🐉',i:'heroes',c:1,r:1,t:'TX',hp:100,atk:['🟢 Acid Spit','🦎 Tail Whip','🌀 Wing Dive'],dmg:[26,16,22]},
   KONG:{n:'King Kong',e:'🦍',i:'heroes',c:2,r:1,t:'PH',hp:110,atk:['👊 Ground Pound','💢 Chest Beat','🪨 Boulder Throw'],dmg:[22,18,26]},
-  EVOGZ:{n:'Evolved Godzilla',e:'💜',i:'special',c:0,r:0,t:'EV',hp:200,atk:['💜 Purple Beam','🌀 Gravity Crush','✨ Void Nova'],dmg:[45,38,55],bossOnly:true},
-  BURNGZ:{n:'Burning Godzilla',e:'🔥',i:'special',c:1,r:0,t:'FI',hp:190,atk:['🔥 Thermal Blast','💥 Meltdown','🌋 Fire Supernova'],dmg:[52,42,62],bossOnly:true},
+  EVOGZ:{n:'Evolved Godzilla',e:'💜',i:'special',c:0,r:0,t:'EV',hp:250,atk:['💜 Purple Beam','🌀 Gravity Crush','✨ Void Nova'],dmg:[50,42,60],bossOnly:true},
+  BURNGZ:{n:'Burning Godzilla',e:'🔥',i:'special',c:1,r:0,t:'FI',hp:240,atk:['🔥 Thermal Blast','💥 Meltdown','🌋 Fire Supernova'],dmg:[58,48,68],bossOnly:true},
   ANGUIRUS:{n:'Anguirus',e:'🐢',i:'toho',c:0,r:0,t:'PH',hp:95,atk:['🔄 Roll Attack','🦄 Horn Slam','🦎 Tail Spin'],dmg:[20,18,22],pass:{tp:'healC',v:3}},
   RODAN:{n:'Rodan',e:'🦅',i:'toho',c:1,r:0,t:'FL',hp:85,atk:['💨 Wind Shear','🔊 Sonic Boom','⬇️ Dive Bomb'],dmg:[22,20,26],pass:{tp:'atkB',v:2}},
   GHIDORAH:{n:'King Ghidorah',e:'🐲',i:'toho',c:2,r:0,t:'LI',hp:180,atk:['⚡ Triple Lightning','🌀 Gravity Beam','💀 Annihilator'],dmg:[38,34,44],boss:true,pass:{tp:'starsX',v:1.5}},
@@ -296,8 +296,8 @@ const QE=[
 // STATE
 let gs={name:'',roster:['GODZILLA'],caught:[],stars:0,wins:0,bossIdx:0,heroKey:'GODZILLA',enemyKey:null,heroHp:0,heroMaxHp:0,enemyHp:0,enemyMaxHp:0,arenaIdx:0,rageStreak:0,rage:false,shield:false,powerUp:false,potionActive:false,isBoss:false,active:false,pendingBoss:false,pass:{hpB:0,atkB:0,starsX:1,healC:0,eRed:0,blkC:0}};
 let bLock=false;
-async function saveG(){try{await window.storage.set('kaijuv9',JSON.stringify({name:gs.name,roster:gs.roster,caught:gs.caught,stars:gs.stars,wins:gs.wins,bossIdx:gs.bossIdx}));}catch(e){}}
-async function loadG(){try{const r=await window.storage.get('kaijuv9');if(r&&r.value){const d=JSON.parse(r.value);Object.assign(gs,{name:d.name||'',roster:d.roster||['GODZILLA'],caught:d.caught||[],stars:d.stars||0,wins:d.wins||0,bossIdx:d.bossIdx||0});}}catch(e){}preloadImgs();}
+async function saveG(){const d=JSON.stringify({name:gs.name,roster:gs.roster,caught:gs.caught,stars:gs.stars,wins:gs.wins,bossIdx:gs.bossIdx});try{localStorage.setItem('kaijuv9',d);}catch(e){}try{await window.storage.set('kaijuv9',d);}catch(e){}}
+async function loadG(){let d=null;try{const s=localStorage.getItem('kaijuv9');if(s)d=JSON.parse(s);}catch(e){}if(!d)try{const r=await window.storage.get('kaijuv9');if(r&&r.value)d=JSON.parse(r.value);}catch(e){}if(d)Object.assign(gs,{name:d.name||'',roster:d.roster||['GODZILLA'],caught:d.caught||[],stars:d.stars||0,wins:d.wins||0,bossIdx:d.bossIdx||0});preloadImgs();}
 function calcP(){const p={hpB:0,atkB:0,starsX:1,healC:0,eRed:0,blkC:0};gs.caught.forEach(k=>{const m=MD[k];if(!m||!m.pass)return;const{tp,v}=m.pass;if(tp==='hpB')p.hpB+=v;if(tp==='atkB')p.atkB+=v;if(tp==='starsX')p.starsX=Math.min(p.starsX*v,3);if(tp==='healC')p.healC+=v;if(tp==='eRed')p.eRed+=v;if(tp==='blkC')p.blkC=Math.min(p.blkC+v,.5);});gs.pass=p;}
 let ac=null;
 function snd(t){try{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);const ct=ac.currentTime,c={ok:[523,784,.3,'sine'],no:[220,140,.3,'sawtooth'],hit:[90,50,.2,'square'],win:[523,700,.6,'sine'],boss:[55,41,.9,'sawtooth'],potion:[400,600,.3,'sine']}[t]||[200,100,.2,'square'];o.type=c[3];o.frequency.setValueAtTime(c[0],ct);o.frequency.exponentialRampToValueAtTime(c[1],ct+c[2]);g.gain.setValueAtTime(.25,ct);g.gain.exponentialRampToValueAtTime(.001,ct+c[2]);o.start(ct);o.stop(ct+c[2]);}catch(e){}}
@@ -397,7 +397,7 @@ function heroAtks(){
 }
 function enemyAtks(){
   if(!gs.active)return;const enemy=MD[gs.enemyKey];
-  let dmg=Math.round(enemy.dmg[~~(Math.random()*3)]*(gs.isBoss?1.5:1))+~~(Math.random()*4)-Math.min(gs.pass.eRed,4);dmg=Math.max(1,dmg);
+  let dmg=Math.round(enemy.dmg[~~(Math.random()*3)]*(gs.isBoss?1.1:1))+~~(Math.random()*4)-Math.min(gs.pass.eRed,4);dmg=Math.max(1,dmg);
   if(gs.shield){gs.shield=false;setLog(`🛡️ Shield blocked ${enemy.n}!`);setTimeout(()=>{rBattle();bLock=false;},700);return;}
   if(Math.random()<gs.pass.blkC){setLog(`🛡️ Blocked!`);setTimeout(()=>{rBattle();bLock=false;},700);return;}
   gs.heroHp=Math.max(0,gs.heroHp-dmg);if(gs.heroHp<=0)gs.active=false;
@@ -405,12 +405,7 @@ function enemyAtks(){
   setLog(`🔴 ${enemy.n} hits you! -${dmg} HP!`);
   setTimeout(()=>{rBattle();if(gs.heroHp<=0)setTimeout(loseBattle,800);else bLock=false;},600);
 }
-function counterAtk(){
-  const enemy=MD[gs.enemyKey];const dmg=Math.max(4,Math.round(enemy.dmg[0]*0.28));
-  gs.heroHp=Math.max(0,gs.heroHp-dmg);if(gs.heroHp<=0)gs.active=false;
-  setLog(`❌ Wrong! ${enemy.n} taunts! -${dmg} HP (small hit)`);
-  setTimeout(()=>{rBattle();if(gs.heroHp<=0)setTimeout(loseBattle,800);else bLock=false;},1000);
-}
+function counterAtk(){setLog('❌ Wrong answer! No attack this turn — try again next round!');gs.rageStreak=0;setTimeout(()=>{bLock=false;},900);}
 function winBattle(){
   gs.active=false;bLock=false;const iB=gs.isBoss;
   const earned=Math.round((iB?12:3)*gs.pass.starsX);gs.stars+=earned;gs.wins++;if(iB)gs.bossIdx++;
@@ -422,7 +417,7 @@ function exitBattle(){gs.active=false;bLock=false;gs.shield=false;gs.powerUp=fal
 
 function rBossChoice(){
   const bK=BOSS_ORDER[gs.bossIdx%BOSS_ORDER.length];snd('boss');
-  $('app').innerHTML=`<div class="scr" style="background:radial-gradient(ellipse,#2a0010,#08081a)"><div style="font-size:26px;color:#e74c3c;animation:bob 1s infinite;margin-bottom:10px">💀 BOSS BATTLE!</div><div style="font-size:20px;margin-bottom:6px">Facing: ${MD[bK].e} ${MD[bK].n}</div><div style="font-size:17px;color:#aaa;margin-bottom:20px">Boss has ${MD[bK].hp*3} HP and hits hard!</div>
+  $('app').innerHTML=`<div class="scr" style="background:radial-gradient(ellipse,#2a0010,#08081a)"><div style="font-size:26px;color:#e74c3c;animation:bob 1s infinite;margin-bottom:10px">💀 BOSS BATTLE!</div><div style="font-size:20px;margin-bottom:6px">Facing: ${MD[bK].e} ${MD[bK].n}</div>  <div style="font-size:17px;color:#aaa;margin-bottom:20px">Boss has ${MD[bK].hp*2} HP and hits harder!</div>
   <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;width:100%;max-width:400px">
     <div class="pbox" style="cursor:pointer;border-color:#9b59b6;flex:1;min-width:150px;text-align:center" onclick="startBoss('EVOGZ')">${sprHtml('EVOGZ',100)}<div style="font-size:18px;color:#9b59b6;margin-top:6px">EVOLVED 💜</div><div style="font-size:15px;color:#aaa">HP: 200</div></div>
     <div class="pbox" style="cursor:pointer;border-color:#e74c3c;flex:1;min-width:150px;text-align:center" onclick="startBoss('BURNGZ')">${sprHtml('BURNGZ',100)}<div style="font-size:18px;color:#e74c3c;margin-top:6px">BURNING 🔥</div><div style="font-size:15px;color:#aaa">HP: 190</div></div>
@@ -433,7 +428,7 @@ function startBoss(fK){
   calcP();bLock=false;const form=MD[fK];gs.heroKey=fK;gs.heroHp=form.hp;gs.heroMaxHp=form.hp;
   gs.isBoss=true;gs.rageStreak=0;gs.rage=false;gs.active=true;gs.pendingBoss=false;
   const bK=BOSS_ORDER[gs.bossIdx%BOSS_ORDER.length];
-  gs.enemyKey=bK;gs.enemyHp=MD[bK].hp*3;gs.enemyMaxHp=MD[bK].hp*3;
+  gs.enemyKey=bK;gs.enemyHp=MD[bK].hp*2;gs.enemyMaxHp=MD[bK].hp*2;
   gs.arenaIdx=(gs.arenaIdx+1)%ARENAS.length;rBattle();
 }
 
